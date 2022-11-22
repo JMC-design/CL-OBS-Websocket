@@ -6,7 +6,6 @@
   :author "Johannes Martinez Calzada"
   :depends-on ("websocket-driver" "ironclad" "jsown")
   :components ((:file "package")
-               (:file "keys")
                (:file "utils")
                (:file "macros")
                (:file "enums")
