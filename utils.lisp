@@ -1,9 +1,12 @@
 (in-package #:cl-obs-websocket)
 
+(defun s+ (&rest parts)
+  (apply #'concatenate 'string (mapcar #'string (remove-if #'null parts))))
+
 (defun find-sym (string keys)
   (loop :for key :in keys
         :for found := (or (and (listp key) (string-equal string (second key)) (car key))
-                          (and (string-equal (u::stringify key #'string-downcase) string)key))
+                          (and (atom key)(string-equal (format nil "~(~a~)" key) string) key))
         :until found
         :finally (return found)))
 
@@ -13,13 +16,13 @@
         :for (key . value) :in (cdr obj)
         :for sym := (find-sym key keys)
         :when (member key pkeys :test #'string-equal)
-          :collect (u:kintern sym t)
+          :collect (intern (string-upcase sym) :keyword)
           :and
             :collect value))
 
 (defun encode-strings (a b)
   (cl-base64:usb8-array-to-base64-string
-   (ironclad:digest-sequence :sha256 (ironclad:ascii-string-to-byte-array (u:s+ a b)))))
+   (ironclad:digest-sequence :sha256 (ironclad:ascii-string-to-byte-array (s+ a b)))))
 
 (defun get-args (list)
   (loop :for (symbol string) :in list
@@ -31,7 +34,7 @@
 
 (defun make-plist (names)
   (loop :for name :in names
-        :collect (u:kintern name)
+        :collect (intern (string-upcase name) :keyword)
         :collect name))
 
 (defun process-keys (keys &optional strings)
@@ -43,7 +46,7 @@
                        (car thing))
         :else
           :collect (if strings
-                       (u::stringify thing #'string-downcase)
+                       (format nil "~(~a~)" thing)
                        thing)))
 
 (defun de-camel (string)
@@ -74,17 +77,10 @@
 
 (defun create-event (type obj)
   (declare (optimize debug))'
-  (let ((reader (find-symbol (u:s+ 'read- (de-camel type)) :cl-obs-websocket)))
+  (let ((reader (find-symbol (s+ 'read- (de-camel type)) :cl-obs-websocket)))
     (funcall reader obj)))
 
 (defun make-mods (&optional control shift alt command)
   (macrolet ((switch (a)  `(if ,a t :false)))
    (jsown:new-js ("control" (switch control)) ("shift" (switch shift)) ("alt" (switch alt)) ("command" (switch command)))))
 
-
-(defun get-descriptions (file)
-  (let ((objects (jsown:parse (fs:file->string file))))
-    (with-keys ((requests "requests") (events "events")) objects
-      (loop :for obj :in requests
-            :collect (with-keys ((description "description") (type "requestType")) obj
-                       (cons (find-symbol (de-camel Type)) description))))))

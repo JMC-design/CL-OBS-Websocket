@@ -10,12 +10,19 @@
                                    data
                                    nil)))
               id))))
+(defun find-sym (string keys)
+  (declare (optimize debug))
+  (loop :for key :in keys
+        :for found := (or (and (listp key) (string-equal string (second key)) (car key))
+                          (and (atom key) (string-equal string (string-downcase (symbol-name key))) key))
+        :until found
+        :finally (return found)))
 
 ;;;; General Requests
 (define-request "GetVersion")
 (define-request "GetStats")
 (DEFINE-REQUEST "BroadcastCustomEvent" ((event "eventData")))
-(define-request "CallVendorRequest"
+(define-request "CallVendorRequest"x
                 ((name "vendorName")
                  (type "requestType")
                  (data "?requestData")))

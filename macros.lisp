@@ -9,8 +9,7 @@
 (defmacro define-request (id &optional data-fields optional)
   (let ((name (if (listp id) (car id) (intern (de-camel id)))))
     `(progn
-       (defun ,name (,@(get-args data-fields)
-                     &optional,@(get-args optional) (client *client*))
+       (defun ,name (,@(get-args data-fields) &optional,@(get-args optional) (client *client*))
          (declare (optimize debug))
          (multiple-value-bind (request id)
              (make-request
@@ -28,12 +27,12 @@
 (defun make-exports (name slots)
   (append (list name)
           (loop :for slot :in slots
-                :collect (intern (u:s+ name '- slot)))))
+                :collect (intern (s+ name '- slot)))))
 
 (defmacro define-event (name &optional slots)
   (let* ((name (intern (de-camel name)))
          (slot-names  (mapcar (lambda (s) (intern (de-camel s))) slots))
-         (reader (intern (u:s+ 'read- name)))
+         (reader (intern (s+ 'read- name)))
          (exports (make-exports name slot-names)))
     `(progn (defstruct (,name (:include event))
               ,@slot-names)
@@ -41,5 +40,5 @@
               (with-keys (,@(loop :for slot :in slots
                                   :for name :in slot-names
                                   :collect `(,name ,slot)))msg
-                (,(intern (string-upcase (u:s+ 'make- name))) ,@(make-plist slot-names))))
+                (,(intern (string-upcase (s+ 'make- name))) ,@(make-plist slot-names))))
             (export ',exports))))

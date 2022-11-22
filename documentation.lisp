@@ -1,5 +1,12 @@
 ;;;;Generated from https://github.com/obsproject/obs-websocket/blob/master/docs/generated/protocol.json
 (in-package :cl-obs-websocket)
+
+(defun get-descriptions (file)
+  (let ((objects (jsown:parse (fs:file->string file))))
+    (with-keys ((requests "requests") (events "events")) objects
+      (loop :for obj :in requests
+            :collect (with-keys ((description "description") (type "requestType")) obj
+                       (cons (find-symbol (de-camel Type)) description))))))
 (defun document (docs)
   (loop :for (sym . doc) :in docs
         :do (setf (documentation sym 'function) doc)))
