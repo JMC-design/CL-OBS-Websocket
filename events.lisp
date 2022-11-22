@@ -2,14 +2,6 @@
 
 (defstruct event)
 
-(defgeneric handle-event (event)
-  (:method (event) (print event)
-     ;(print (trivial-json-codec:deserialize-raw (jsown:to-json event)))
-    ))
-(defun create-event (type obj)
-  (declare (optimize debug))
-  (let ((reader (find-symbol (u:fp (u:s+ 'read- (de-snake type))) :cl-obs-websocket)))
-    (funcall reader obj)))
 
 ;;;; General Events
 
@@ -52,7 +44,7 @@
 
 ;;;; Transition Events
 
-+(define-event "CurrentSceneTransitionChanged" ("transitionName"))
+(define-event "CurrentSceneTransitionChanged" ("transitionName"))
 (define-event "CurrentSceneTransitionDurationChanged" ("transitionDuration"))
 (define-event "SceneTransitionStarted" ("transitionName"))
 (define-event "SceneTransitionEnded" ("transitionName"))
@@ -61,7 +53,7 @@
 ;;;; Filters Events
 
 (define-event "SourceFilterListReindexed" ("sourceName" "filters"))
-(define-event "SourceFilterCreated" ("sourceName" "filterName" " filterKind" "filterIndex" "filterSettings" "defaultFilterSettings"))
+(define-event "SourceFilterCreated" ("sourceName" "filterName" "filterKind" "filterIndex" "filterSettings" "defaultFilterSettings"))
 (define-event "SourceFilterRemoved" ("sourceName" "filterName"))
 (define-event "SourceFilterNameChanged" ("sourceName" "oldFilterName" "filterName"))
 (define-event "SourceFilterEnableStateChanged" ("sourceName" "filterName" "filterEnabled"))

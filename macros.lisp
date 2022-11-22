@@ -6,30 +6,40 @@
        (declare (ignorable ,@pkeys))
        ,@body)))
 
-
 (defmacro define-request (id &optional data-fields optional)
-  (let ((name (if (listp id) (car id) (intern (de-snake id)))))
-    `(defun ,name (,@(get-args data-fields)
-                   &optional,@(get-args optional) (client *client*))
-       (multiple-value-bind (request id)
-           (make-request
-            ,(if (listp id)
-                 (second id)
-                 id)
-            (jsown:new-js
-              ,@(get-fields data-fields)
-              ,@(get-fields optional))) ;:fixme
-         (send-message (make-message 6 request) client)
-         (get-response id client (client-js-parser client))))))
+  (let ((name (if (listp id) (car id) (intern (de-camel id)))))
+    `(progn
+       (defun ,name (,@(get-args data-fields)
+                     &optional,@(get-args optional) (client *client*))
+         (declare (optimize debug))
+         (multiple-value-bind (request id)
+             (make-request
+              ,(if (listp id)
+                   (second id)
+                   id)
+              (list* :obj (remove nil (cdr (jsown:new-js
+                                             ,@(get-fields data-fields)
+                                             ,@(get-fields optional))) :key #'cdr))) ;:fixme remove :false?
+           (send-message (make-message 6 request) client)
+           (values (get-response id client (client-js-parser client))
+                   id)))
+       (export ',name :cl-obs-websocket))))
 
--(defmacro define-event (name &optional slots)
-  (let* ((name (intern (de-snake name)))
-         (slot-names  (mapcar (lambda (s) (intern (de-snake s))) slots))
-         (reader (intern (u:s+ 'read- name))))
+(defun make-exports (name slots)
+  (append (list name)
+          (loop :for slot :in slots
+                :collect (intern (u:s+ name '- slot)))))
+
+(defmacro define-event (name &optional slots)
+  (let* ((name (intern (de-camel name)))
+         (slot-names  (mapcar (lambda (s) (intern (de-camel s))) slots))
+         (reader (intern (u:s+ 'read- name)))
+         (exports (make-exports name slot-names)))
     `(progn (defstruct (,name (:include event))
               ,@slot-names)
             (defun ,reader  (msg)
               (with-keys (,@(loop :for slot :in slots
                                   :for name :in slot-names
                                   :collect `(,name ,slot)))msg
-                (,(intern (string-upcase (u:s+ 'make- name))) ,@(make-plist slot-names)))))))
+                (,(intern (string-upcase (u:s+ 'make- name))) ,@(make-plist slot-names))))
+            (export ',exports))))

@@ -46,7 +46,7 @@
                        (u::stringify thing #'string-downcase)
                        thing)))
 
-(defun de-snake (string)
+(defun de-camel (string)
   (string-upcase (concatenate 'string
                               (loop :for char :across string
                                     :for i :from 0
@@ -58,7 +58,7 @@
                                     :else
                                       :collect char))))
 (defun get-response (id client js-parser)
-  (loop :repeat 10
+  (loop :repeat 18
         :for i := .000001 :then (+ i i) ;:fixme
         :for msg := (gethash id (client-responses client))
         :until msg
@@ -67,3 +67,15 @@
                              (funcall js-parser (jsown:to-json msg))))
         :do (cl:sleep i)))
 
+
+(defgeneric handle-event (event)
+  (:method (event) (print event)))
+
+(defun create-event (type obj)
+  (declare (optimize debug))'
+  (let ((reader (find-symbol (u:s+ 'read- (de-camel type)) :cl-obs-websocket)))
+    (funcall reader obj)))
+
+(defun make-mods (&optional control shift alt command)
+  (macrolet ((switch (a)  `(if ,a t :false)))
+   (jsown:new-js ("control" (switch control)) ("shift" (switch shift)) ("alt" (switch alt)) ("command" (switch command)))))

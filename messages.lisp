@@ -1,7 +1,7 @@
 (in-package #:cl-obs-websocket)
 
 (defun print-error (&key code reason);:fixme 
-  (u:fp (get-close-code code) reason))
+  (print (get-close-code code) reason))
 
 (defun make-message (opcode data)
   (jsown:to-json (jsown:new-js
@@ -33,7 +33,6 @@
     3 (jsown:new-js ("eventSubscriptions"
                      (encode-subscriptions subs))))
    client))
-
 
 (defun process-event (data)
   (declare (optimize debug))

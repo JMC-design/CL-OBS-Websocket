@@ -6,7 +6,9 @@
       (values (jsown:new-js
                 ("requestType" request)
                 ("requestId" id)
-                ("requestData" data))
+                ("requestData" (if (cdr data)
+                                   data
+                                   nil)))
               id))))
 
 ;;;; General Requests
@@ -19,7 +21,7 @@
                  (data "?requestData")))
 (define-request "GetHotkeyList")
 (define-request "TriggerHotkeyByName" ((name "hotkeyName")))
-(define-request "TriggerHotkeyBySequence" () ((id "?keyId") (modifiers "?keyModifiers")))
+(define-request "TriggerHotkeyByKeySequence" ((string "keyId")) ((modifiers "keyModifiers")))
 (define-request "Sleep" nil ((ms "?sleepMillis") (frames "?sleepFrames")))
 
 ;;;; Config requests
@@ -70,8 +72,7 @@
 (DEFINE-REQUEST "SetSceneName" ((old "sceneName") (new "newSceneName")))
 (DEFINE-REQUEST "GetSceneSceneTransitionOverride" ((scene "sceneName")))
 (DEFINE-REQUEST "SetSceneSceneTransitionOverride"
-  ((scene "sceneName"))
-  ((transition "?transitionName") (duration "?transitionDuration")))
+    ((scene "sceneName")(transition "?transitionName") (duration "?transitionDuration")))
 
 ;;;;  Inputs Requests
 
