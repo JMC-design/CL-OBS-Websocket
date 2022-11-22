@@ -13,4 +13,5 @@
                (:file "messages")
                (:file "events")
                (:file "client")
-               (:file "requests")))
+               (:file "requests")
+               (:file "documentation")))

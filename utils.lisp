@@ -57,6 +57,7 @@
                                         :collect char
                                     :else
                                       :collect char))))
+
 (defun get-response (id client js-parser)
   (loop :repeat 18
         :for i := .000001 :then (+ i i) ;:fixme
@@ -79,3 +80,11 @@
 (defun make-mods (&optional control shift alt command)
   (macrolet ((switch (a)  `(if ,a t :false)))
    (jsown:new-js ("control" (switch control)) ("shift" (switch shift)) ("alt" (switch alt)) ("command" (switch command)))))
+
+
+(defun get-descriptions (file)
+  (let ((objects (jsown:parse (fs:file->string file))))
+    (with-keys ((requests "requests") (events "events")) objects
+      (loop :for obj :in requests
+            :collect (with-keys ((description "description") (type "requestType")) obj
+                       (cons (find-symbol (de-camel Type)) description))))))
