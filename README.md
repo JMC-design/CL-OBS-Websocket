@@ -28,3 +28,7 @@ Make a request.
 
 `(obs:get-version)`
 
+Disconnect your client.
+
+`(obs:disconnect client)`
+
