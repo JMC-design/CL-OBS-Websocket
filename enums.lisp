@@ -65,7 +65,6 @@
   #(:none :general :config :scenes :inputs :transitions :filters :outputs :scene-items :media-input :vendors :ui nil nil nil nil nil :input-volume-meters :input-active-state-changed :input-show-stated-changed :scene-item-transformed-changed))
 
 (defun encode-subscriptions (subscriptions)
-  (declare (optimize debug))
   (loop :for sub :in subscriptions :sum (ash 1 (1- (position sub *event-subscription*)))))
 
 (defun decode-subscriptions (integer)

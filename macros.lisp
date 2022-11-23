@@ -10,7 +10,6 @@
   (let ((name (if (listp id) (car id) (intern (de-camel id)))))
     `(progn
        (defun ,name (,@(get-args data-fields) &optional,@(get-args optional) (client *client*))
-         (declare (optimize debug))
          (multiple-value-bind (request id)
              (make-request
               ,(if (listp id)

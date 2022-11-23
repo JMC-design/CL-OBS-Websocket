@@ -2,7 +2,6 @@
 
 (defstruct event)
 
-
 ;;;; General Events
 
 (define-event "ExitStarted")

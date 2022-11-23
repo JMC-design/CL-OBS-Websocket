@@ -11,7 +11,6 @@
         :finally (return found)))
 
 (defun process-obj (keys obj)
-  (declare (optimize debug))
   (loop :with pkeys := (process-keys keys t)
         :for (key . value) :in (cdr obj)
         :for sym := (find-sym key keys)
@@ -38,7 +37,6 @@
         :collect name))
 
 (defun process-keys (keys &optional strings)
-  (declare (optimize debug))
   (loop :for thing :in keys
         :if (listp thing)
           :collect (if strings
@@ -73,14 +71,17 @@
 
 
 (defgeneric handle-event (event)
-  (:method (event) (print event)))
+  (:method ((event event)) (print event)))
 
 (defun create-event (type obj)
-  (declare (optimize debug))'
   (let ((reader (find-symbol (s+ 'read- (de-camel type)) :cl-obs-websocket)))
     (funcall reader obj)))
 
 (defun make-mods (&optional control shift alt command)
-  (macrolet ((switch (a)  `(if ,a t :false)))
-   (jsown:new-js ("control" (switch control)) ("shift" (switch shift)) ("alt" (switch alt)) ("command" (switch command)))))
+  (macrolet ((switch (a) `(if ,a t :false)))
+    (jsown:new-js
+      ("control" (switch control))
+      ("shift" (switch shift))
+      ("alt" (switch alt))
+      ("command" (switch command)))))
 

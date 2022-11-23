@@ -11,7 +11,6 @@
                                    nil)))
               id))))
 (defun find-sym (string keys)
-  (declare (optimize debug))
   (loop :for key :in keys
         :for found := (or (and (listp key) (string-equal string (second key)) (car key))
                           (and (atom key) (string-equal string (string-downcase (symbol-name key))) key))
@@ -22,14 +21,14 @@
 (define-request "GetVersion")
 (define-request "GetStats")
 (DEFINE-REQUEST "BroadcastCustomEvent" ((event "eventData")))
-(define-request "CallVendorRequest"x
+(define-request "CallVendorRequest"
                 ((name "vendorName")
                  (type "requestType")
-                 (data "?requestData")))
+                 (data "requestData")))
 (define-request "GetHotkeyList")
 (define-request "TriggerHotkeyByName" ((name "hotkeyName")))
 (define-request "TriggerHotkeyByKeySequence" ((string "keyId")) ((modifiers "keyModifiers")))
-(define-request "Sleep" nil ((ms "?sleepMillis") (frames "?sleepFrames")))
+(define-request "Sleep" nil ((ms "sleepMillis") (frames "sleepFrames")))
 
 ;;;; Config requests
 (DEFINE-REQUEST "GetPersistentData" ((realm "realm") (slot-name "slotName")))
@@ -45,12 +44,12 @@
 (DEFINE-REQUEST "setProfileParameter" ((name "parameterName") (category "parameterCategory") (value "parameterValue")))
 (DEFINE-REQUEST "GetVideoSettings")
 (DEFINE-REQUEST "SetVideoSettings" ()
-  ((fps-numerator "?fpsNumerator")
-   (fps-denominator "?fpsDenominator")
-   (base-width "?baseWidth")
-   (base-height "?baseHeight")
-   (output-width "?outputWidth")
-   (output-height "?outputHeight")))
+  ((fps-numerator "fpsNumerator")
+   (fps-denominator "fpsDenominator")
+   (base-width "baseWidth")
+   (base-height "baseHeight")
+   (output-width "outputWidth")
+   (output-height "outputHeight")))
 (DEFINE-REQUEST "GetStreamServiceSettings")
 (DEFINE-REQUEST "SetStreamServiceSettings" ((type "streamServiceType") (settings "streamServiceSettings")))
 (DEFINE-REQUEST "GetRecordDirectory")
@@ -60,11 +59,11 @@
 (DEFINE-REQUEST "GetSourceActive" ((source "sourceName")))
 (DEFINE-REQUEST "GetSourceScreenshot"
   ((source "sourceName") (format "imageFormat"))
-  ((width "?imageWidth") (height "?imageHeight") (quality "?imageCompressionQuality")))
+  ((width "imageWidth") (height "imageHeight") (quality "imageCompressionQuality")))
 
 (DEFINE-REQUEST "SaveSourceScreenshot"
   ((source "sourceName") (format "imageFormat") (path "imageFilePath"))
-  ((width "?imageWidth") (height "?imageHeight") (quality "?imageCompressionQuality")))
+  ((width "imageWidth") (height "imageHeight") (quality "imageCompressionQuality")))
 
 ;;;;  Scenes Requests
 
@@ -79,23 +78,23 @@
 (DEFINE-REQUEST "SetSceneName" ((old "sceneName") (new "newSceneName")))
 (DEFINE-REQUEST "GetSceneSceneTransitionOverride" ((scene "sceneName")))
 (DEFINE-REQUEST "SetSceneSceneTransitionOverride"
-    ((scene "sceneName")(transition "?transitionName") (duration "?transitionDuration")))
+    ((scene "sceneName")(transition "transitionName") (duration "transitionDuration")))
 
 ;;;;  Inputs Requests
 
-(DEFINE-REQUEST "GetInputList" () ((kind "?InputKind")))
-(DEFINE-REQUEST "GetInputKindList" () ((unversioned? "?unversioned")) )
+(DEFINE-REQUEST "GetInputList" () ((kind "InputKind")))
+(DEFINE-REQUEST "GetInputKindList" () ((unversioned? "unversioned")) )
 (DEFINE-REQUEST "GetSpecialInputs")
 (DEFINE-REQUEST "CreateInput"
   ((name "inputName") (kind "inputKind") (scene "sceneName"))
-  ((settings "?inputSettings") (enabled? "?sceneItemEnabled")))
+  ((settings "inputSettings") (enabled? "sceneItemEnabled")))
 (DEFINE-REQUEST "RemoveInput" ((name "inputName")))
 (DEFINE-REQUEST "SetInputName" ((old "inputName") (new "newInputName")))
 (DEFINE-REQUEST "GetInputDefaultSettings" ((kind "inputKind")))
 (DEFINE-REQUEST "GetInputSettings" ((name "inputName")))
 (DEFINE-REQUEST "SetInputSettings"
   ((name "inputName") (settings "inputSettings"))
-  ((overlay? "?overlay")))
+  ((overlay? "overlay")))
 
 (DEFINE-REQUEST "GetInputMute" ((name "inputName")))
 (DEFINE-REQUEST "SetInputMute" ((name "inputName") (muted? "inputMuted")))
@@ -103,7 +102,7 @@
 
 (DEFINE-REQUEST "GetInputVolume" ((name "inputName")))
 (DEFINE-REQUEST "SetInputVolume" ((name "inputName"))
-  ((multiplier "?inputVolumeMul") (db "?inputVolumeDb")));:fixme
+  ((multiplier "inputVolumeMul") (db "inputVolumeDb")));:fixme
 
 (DEFINE-REQUEST "GetInputAudioBalance" ((name "inputName")))
 (DEFINE-REQUEST "SetInputAudioBalance" ((name "inputName") (balance "inputAudioBalance")))
@@ -128,10 +127,10 @@
 (DEFINE-REQUEST "GetCurrentSceneTransition")
 (DEFINE-REQUEST "SetCurrentSceneTransition" ((name "transitionName")))
 (DEFINE-REQUEST "SetCurrentSceneTransitionDuration" ((ms "transitionDuration")))
-(DEFINE-REQUEST "SetCurrentSceneTransitionSettings" ((settings "transitionSettings")) ((overlay? "?overlay")))
+(DEFINE-REQUEST "SetCurrentSceneTransitionSettings" ((settings "transitionSettings")) ((overlay? "overlay")))
 (DEFINE-REQUEST "GetCurrentSceneTransitionCursor")
 (DEFINE-REQUEST "TriggerStudioModeTransition")
-(DEFINE-REQUEST "SetTBarPosition" ((position "position")) ((release? "?release")))
+(DEFINE-REQUEST "SetTBarPosition" ((position "position")) ((release? "release")))
 
 ;;;;  Filters Requests
 
@@ -139,14 +138,14 @@
 (DEFINE-REQUEST "GetSourceFilterDefaultSettings"  ((name "filterKind")))
 (DEFINE-REQUEST "CreateSourceFilter"
   ((name "sourceName") (filter "filterName") (kind "filterKind"))
-  ((settings "?filterSettings")))
+  ((settings "filterSettings")))
 (DEFINE-REQUEST "RemoveSourceFilter" ((name "sourceName") (filter "filterName")))
 (DEFINE-REQUEST "SetSourceFilterName"  ((name "sourceName") (old "filterName") (new "newFilterName")))
 (DEFINE-REQUEST "GetSourceFilter" ((name "sourceName") (filter "filterName")))
 (DEFINE-REQUEST "SetSourceFilterIndex" ((name "sourceName") (filter "filterName") (index "filterIndex")))
 (DEFINE-REQUEST "SetSourceFilterSettings"
   ((Name "sourceName") (filter "filterName") (settings "filterSettings"))
-  ((overlay? "?overlay")))
+  ((overlay? "overlay")))
 (DEFINE-REQUEST "SetSourceFilterEnabled"
     ((Name "sourceName") (filter "filterName") (enabled? "filterEnabled")))
 
@@ -156,13 +155,13 @@
 (DEFINE-REQUEST "GetGroupSceneItemList" ((name "sceneName")))
 (DEFINE-REQUEST "GetSceneItemId"
   ((name "sceneName") (source "sourceName"))
-  ((offset "?searchOffset")))
+  ((offset "searchOffset")))
 (DEFINE-REQUEST "CreateSceneItem"
   ((name "sceneName") (source "sourceName"))
-  ((enabled? "?sceneItemEnabled")))
+  ((enabled? "sceneItemEnabled")))
 (DEFINE-REQUEST "RemoveSceneItem" ((name "sceneName") (id "sceneItemId")))
 (DEFINE-REQUEST "DuplicateSceneItem"
-    ((name "sceneName") (id "sceneItemId")) ((scene "?destinationSceneName")))
+    ((name "sceneName") (id "sceneItemId")) ((scene "destinationSceneName")))
 (DEFINE-REQUEST "GetSceneItemTransform" ((name "sceneName") (id "sceneItemId")))
 (DEFINE-REQUEST "SetSceneItemTransform" ((Name "sceneName")(id "sceneItemId") (transform "sceneItemTransform")))
 (DEFINE-REQUEST "GetSceneItemEnabled" ((Name "sceneName")(id "sceneItemId")))
@@ -227,10 +226,10 @@
 (DEFINE-REQUEST "OpenInputFiltersDialog" ((name "inputName")))
 (DEFINE-REQUEST "OpenInputInteractDialog"((name "inputName")))
 (DEFINE-REQUEST "GetMonitorList")
-(DEFINE-REQUEST "OpenVideoMixProjector" ((type "videoMixType")) ((index "?monitorIndex") (geometry "?projectorGeometry")))
-(DEFINE-REQUEST "OpenSourceProjector"((name "sourceName")) ((index "?monitorIndex") (geometry "?projectorGeometry")))
+(DEFINE-REQUEST "OpenVideoMixProjector" ((type "videoMixType")) ((index "monitorIndex") (geometry "projectorGeometry")))
+(DEFINE-REQUEST "OpenSourceProjector"((name "sourceName")) ((index "monitorIndex") (geometry "projectorGeometry")))
 
-;;;; Not documented
+;;;; Not documented, OBS says not documented to discourage use.
 
 (DEFINE-REQUEST "GetSceneItemPrivateSettings" ((Name "sceneName")(id "sceneItemId")))
 (DEFINE-REQUEST "GetSourcePrivateSettings" ((source "sourceName")));:test me

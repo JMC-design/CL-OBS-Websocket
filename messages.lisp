@@ -35,7 +35,6 @@
    client))
 
 (defun process-event (data)
-  (declare (optimize debug))
   (with-keys ((type "eventType") (data "eventData") (intent "eventIntent")) data
     (handle-event (create-event type data))))
 
@@ -60,7 +59,6 @@
     version))
 
 (defun process-message (msg)
-  (declare (optimize debug))
   (with-keys (op d) (jsown:parse msg)
     (if op
         (case op
